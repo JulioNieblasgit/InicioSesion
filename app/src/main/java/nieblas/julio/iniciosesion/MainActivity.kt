@@ -1,12 +1,9 @@
 package nieblas.julio.iniciosesion
 
 import android.content.Intent
-import android.content.res.Configuration
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
-import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -15,9 +12,11 @@ import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 
+
 class MainActivity : AppCompatActivity() {
     lateinit var mGoogleSignInClient: GoogleSignInClient
     val RC_SIGN_IN= 123
+    val COD_LOGOUT = 323
     private val TAG ="MyActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,9 +41,29 @@ val  gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == RC_SIGN_IN){
-            val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             handleSignInResult(task)
         }
+        if(requestCode == COD_LOGOUT){
+            signOut()
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        // Check for existing Google Sign In account, if the user is already signed in
+// the GoogleSignInAccount will be non-null.
+        // Check for existing Google Sign In account, if the user is already signed in
+// the GoogleSignInAccount will be non-null.
+        val account = GoogleSignIn.getLastSignedInAccount(this)
+        updateUI(account!!)
+    }
+    private fun signOut() {
+        mGoogleSignInClient.signOut()
+            .addOnCompleteListener(this) {
+             Toast.makeText(this, "sesion terminada", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private  fun handleSignInResult(completeTask: Task<GoogleSignInAccount>){
@@ -59,12 +78,12 @@ val  gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         }
     }
 
-    private fun updateUI(account: GoogleSignInAccount){
+    private fun updateUI(account: GoogleSignInAccount?){
         if(account!= null){
             val intent = Intent(this, PrincipalActivity::class.java)
             intent.putExtra("name",account.displayName)
             intent.putExtra("email", account.email)
-            startActivity(intent)
+            startActivityForResult(intent, COD_LOGOUT)
         }
     }
 }

@@ -14,6 +14,7 @@ class PrincipalActivity : AppCompatActivity() {
         var tv_nombre : TextView = findViewById(R.id.tv_nombre)
         var tv_email : TextView = findViewById(R.id.tv_email)
         var btn_cerrar : TextView = findViewById(R.id.btn_cerrar)
+        // nuevo
 
         if (bundle != null){
             val name = bundle.getString("name")
